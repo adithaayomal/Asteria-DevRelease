@@ -162,7 +162,6 @@ MonoBehaviour:
   ui: {fileID: 8524279837045667672}
   interactRange: 5
   healthpointImage: {fileID: 4961570261857001599}
-  teamText: {fileID: 6518096944613936121}
 --- !u!54 &-6606432419542394105
 Rigidbody:
   m_ObjectHideFlags: 0
