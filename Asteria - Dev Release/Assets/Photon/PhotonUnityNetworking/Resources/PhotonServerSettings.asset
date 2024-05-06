@@ -15,7 +15,7 @@ MonoBehaviour:
   AppSettings:
     AppIdRealtime: 132b4cb7-5dc1-45db-8abb-16db2d54d2e7
     AppIdFusion: 
-    AppIdChat: 
+    AppIdChat: 40310cf3-cabe-4ed8-9951-b40593412f67
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
@@ -42,6 +42,7 @@ MonoBehaviour:
   - RPC_TakeDamage
   - RPC_Shoot
   - AssignPlayerTeam
+  - ReceiveChatMessage
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 1
