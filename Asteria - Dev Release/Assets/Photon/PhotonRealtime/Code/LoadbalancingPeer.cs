@@ -413,10 +413,7 @@ namespace Photon.Realtime
                 byte maxPlayersAsByte = opJoinRandomRoomParams.ExpectedMaxPlayers <= byte.MaxValue ? (byte)opJoinRandomRoomParams.ExpectedMaxPlayers : (byte)0;
 
                 expectedRoomProperties[GamePropertyKey.MaxPlayers] = maxPlayersAsByte;
-                if (opJoinRandomRoomParams.ExpectedMaxPlayers > byte.MaxValue)
-                {
-                    expectedRoomProperties[GamePropertyKey.MaxPlayersInt] = opJoinRandomRoomParams.ExpectedMaxPlayers;
-                }
+                expectedRoomProperties[GamePropertyKey.MaxPlayersInt] = opJoinRandomRoomParams.ExpectedMaxPlayers;
             }
 
             Dictionary<byte, object> opParameters = new Dictionary<byte, object>();
@@ -446,9 +443,6 @@ namespace Photon.Realtime
                 opParameters[ParameterCode.Add] = opJoinRandomRoomParams.ExpectedUsers;
             }
 
-            opParameters[ParameterCode.AllowRepeats] = true; // enables temporary queueing for low ccu matchmaking situations
-
-
             //this.Listener.DebugReturn(DebugLevel.INFO, "OpJoinRandomRoom: " + SupportClass.DictionaryToString(opParameters));
             return this.SendOperation(OperationCode.JoinRandomGame, opParameters, SendOptions.SendReliable);
         }
@@ -475,10 +469,7 @@ namespace Photon.Realtime
                 byte maxPlayersAsByte = opJoinRandomRoomParams.ExpectedMaxPlayers <= byte.MaxValue ? (byte)opJoinRandomRoomParams.ExpectedMaxPlayers : (byte)0;
 
                 expectedRoomProperties[GamePropertyKey.MaxPlayers] = maxPlayersAsByte;
-                if (opJoinRandomRoomParams.ExpectedMaxPlayers > byte.MaxValue)
-                {
-                    expectedRoomProperties[GamePropertyKey.MaxPlayersInt] = opJoinRandomRoomParams.ExpectedMaxPlayers;
-                }
+                expectedRoomProperties[GamePropertyKey.MaxPlayersInt] = opJoinRandomRoomParams.ExpectedMaxPlayers;
             }
 
             Dictionary<byte, object> opParameters = new Dictionary<byte, object>();
@@ -517,7 +508,6 @@ namespace Photon.Realtime
             // partial copy of OpCreateRoom
 
             opParameters[ParameterCode.JoinMode] = (byte)JoinMode.CreateIfNotExists;
-            opParameters[ParameterCode.AllowRepeats] = true; // enables temporary queueing for low ccu matchmaking situations
 
             if (createRoomParams != null)
             {
@@ -561,7 +551,7 @@ namespace Photon.Realtime
         /// This is an async request which triggers a OnOperationResponse() call.
         /// Returned game list is stored in RoomInfoList.
         /// </remarks>
-        /// <see href="https://doc.photonengine.com/en-us/realtime/current/reference/matchmaking-and-lobby#sql_lobby_type"/>
+        /// <see cref="https://doc.photonengine.com/en-us/realtime/current/reference/matchmaking-and-lobby#sql_lobby_type"/>
         /// <param name="lobby">The lobby to query. Has to be of type SqlLobby.</param>
         /// <param name="queryData">The sql query statement.</param>
         /// <returns>If the operation could be sent (has to be connected).</returns>
@@ -854,11 +844,10 @@ namespace Photon.Realtime
                 return this.SendOperation(OperationCode.AuthenticateOnce, opParameters, SendOptions.SendReliable); // we don't have to encrypt, when we have a token (which is encrypted)
             }
 
-            if (encryptionMode == EncryptionMode.DatagramEncryptionGCM && expectedProtocol != ConnectionProtocol.Udp)
+            if (encryptionMode == EncryptionMode.DatagramEncryption && expectedProtocol != ConnectionProtocol.Udp)
             {
                 // TODO disconnect?!
-                // TODO use some other form of callback?!
-                throw new NotSupportedException("Expected protocol set to UDP, due to encryption mode DatagramEncryptionGCM.");
+                throw new NotSupportedException("Expected protocol set to UDP, due to encryption mode DatagramEncryption.");    // TODO use some other form of callback?!
             }
 
             opParameters[ParameterCode.ExpectedProtocol] = (byte)expectedProtocol;
@@ -1089,7 +1078,7 @@ namespace Photon.Realtime
     /// Parameters for the matchmaking of JoinRandomRoom and JoinRandomOrCreateRoom.
     /// </summary>
     /// <remarks>
-    /// More about matchmaking: <see href="https://doc.photonengine.com/en-us/pun/current/manuals-and-demos/matchmaking-and-lobby"/>.
+    /// More about matchmaking: <see cref="https://doc.photonengine.com/en-us/pun/current/manuals-and-demos/matchmaking-and-lobby"/>.
     /// </remarks>
     public class OpJoinRandomRoomParams
     {
@@ -1332,10 +1321,8 @@ namespace Photon.Realtime
     {
         /// <summary>(255) Max number of players that "fit" into this room. 0 is for "unlimited".</summary>
         public const byte MaxPlayers = 255;
-
-        /// <summary>(243) Integer-typed max number of players that "fit" into a room. 0 is for "unlimited". Important: Code changed. See remarks.</summary>
-        /// <remarks>This was code 244 for a brief time (Realtime v4.1.7.2 to v4.1.7.4) and those versions must be replaced or edited!</remarks>
-        public const byte MaxPlayersInt = 243;
+        /// <summary>(244) Integer-typed max number of players that "fit" into this room. 0 is for "unlimited".</summary>
+        public const byte MaxPlayersInt = 244;
 
         /// <summary>(254) Makes this room listed or not in the lobby on master.</summary>
         public const byte IsVisible = 254;
@@ -1415,7 +1402,7 @@ namespace Photon.Realtime
         /// Obsolete. Replaced by Leave. public const byte Disconnect = LiteEventCode.Disconnect;
 
         /// <summary>(251) Sent by Photon Cloud when a plugin-call or webhook-call failed or events cache limit exceeded. Usually, the execution on the server continues, despite the issue. Contains: ParameterCode.Info.</summary>
-        /// <seealso href="https://doc.photonengine.com/en-us/realtime/current/reference/webhooks#options"/>
+        /// <seealso cref="https://doc.photonengine.com/en-us/realtime/current/reference/webhooks#options"/>
         public const byte ErrorInfo = 251;
 
         /// <summary>(250) Sent by Photon whent he event cache slice was changed. Done by OpRaiseEvent.</summary>
@@ -1567,7 +1554,7 @@ namespace Photon.Realtime
         /// <summary>(216) This key's (string) value provides parameters sent to the custom authentication type/service the client connects with. Used in OpAuthenticate</summary>
         public const byte ClientAuthenticationParams = 216;
 
-        // /// <summary>(215) Makes the server create a room if it doesn't exist. OpJoin uses this to always enter a room, unless it exists and is full/closed.</summary>
+        /// <summary>(215) Makes the server create a room if it doesn't exist. OpJoin uses this to always enter a room, unless it exists and is full/closed.</summary>
         // public const byte CreateIfNotExists = 215;
 
         /// <summary>(215) The JoinMode enum defines which variant of joining a room will be executed: Join only if available, create if not exists or re-join.</summary>
@@ -1660,9 +1647,6 @@ namespace Photon.Realtime
 
         /// <summary>Used server side once the group is extracted from the ticket. Clients don't send this.</summary>
         public const byte MatchMakingGroupId = 189;
-
-        /// <summary>(188) Parameter key to let the server know it may queue the client in low-ccu matchmaking situations.</summary>
-        public const byte AllowRepeats = 188;
     }
 
 
