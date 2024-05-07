@@ -11,8 +11,9 @@ public class PlayerManager : MonoBehaviour
     PhotonView PV;
     // Start is called before the first frame update
 	GameObject controller;
-
-	
+	int kills;
+	int deaths;
+	public CountdownTimer countdownTimer;
 
     void Awake()
 	{
@@ -24,7 +25,11 @@ public class PlayerManager : MonoBehaviour
 		if(PV.IsMine)
 		{
 			CreateController();
-
+			if (countdownTimer != null)
+			{
+				// Start the countdown timer
+				countdownTimer.StartTimer();
+			}
 			
 		}
 
@@ -43,8 +48,34 @@ public class PlayerManager : MonoBehaviour
 		PhotonNetwork.Destroy(controller);
 		CreateController();
 
+		deaths++;
+
+		Hashtable hash = new Hashtable();
+		hash.Add("deaths", deaths);
+		PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+
 	}
 
+	public void GetKill()
+	{
+		PV.RPC(nameof(RPC_GetKill), PV.Owner);
+	}
+
+	[PunRPC]
+
+	void RPC_GetKill()
+	{
+		kills++;
+
+		Hashtable hash = new Hashtable();
+		hash.Add("kills", kills);
+		PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+	}
+
+	public static PlayerManager Find(Player player)
+	{
+		return FindObjectsOfType<PlayerManager>().SingleOrDefault(x => x.PV.Owner == player);
+	}
 
 	
 	

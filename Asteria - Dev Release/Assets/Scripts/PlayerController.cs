@@ -226,18 +226,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 		PV.RPC(nameof(RPC_TakeDamage), PV.Owner, damage);
 	}
     [PunRPC]
-	void RPC_TakeDamage(float damage)
+	void RPC_TakeDamage(float damage, PhotonMessageInfo info)
 	{
 		
-        if(!PV.IsMine)
-			return;
+        
         currentHealth -= damage;
 
 		healthbarImage.fillAmount = currentHealth / maxHealth;
 		if(currentHealth <= 0)
 		{
 			Die();
-			
+			PlayerManager.Find(info.Sender).GetKill();
 		}
 	}
 
